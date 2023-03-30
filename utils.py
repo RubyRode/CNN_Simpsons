@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 from torchvision.utils import make_grid
 import torch
-import time
 import re
 import os
-import numpy as np
 
 
 def show_img(dataset, idx):
@@ -68,42 +66,6 @@ class DeviceDataLoader:
         """Number of batches"""
         return len(self.dl)
 
-
-@torch.no_grad()
-def evaluate(model, val_loader):
-    model.eval()
-    outputs = [model.validation_step(batch) for batch in val_loader]
-    return model.validation_epoch_end(outputs)
-
-
-def fit(epochs, model, train_loader, optimizer):
-    history = []
-    model.train()
-    for epoch in range(epochs):
-        # Training Phase
-        train_losses = []
-        accuracies = []
-        start_time = time.time()
-        for batch in train_loader:
-            optimizer.zero_grad()
-            tar, loss = model.predict(batch)
-            train_losses.append(loss)
-            loss.backward()
-            optimizer.step()
-            print("Epoch: [{}], Batch accuracy: {:.4f}".format(epoch, model.accuracy(tar, batch[1]).item()),
-                  file=open("log.txt", 'w'))
-            accuracies.append(model.accuracy(tar, batch[1]).to('cpu'))
-        # Validation phase
-        end_time = time.time()
-        accuracies = np.array(accuracies)
-        result = {'epoch': epoch, 'train_loss': loss.item(), 'accuracy': accuracies.mean(),
-                  'time': end_time - start_time}
-        print("| Epoch: [{}] | Train_loss: {:.4f} | Accuracy: {:.4f} | Time: {:.4f} |".format(result['epoch'],
-                                                                                              result['train_loss'],
-                                                                                              result['accuracy'],
-                                                                                              result['time']))
-        history.append(result)
-    return history
 
 
 def plot_accuracies(history):
