@@ -27,12 +27,21 @@ def show_batch(batch, name):
 
 def get_log_num(path):
 
-    log_list = list(filter(re.compile('log_*.').match, os.listdir(path)))
-    log_list = list([s.replace('log_', '') for s in log_list])
-    log_list = list([s.replace('.txt', '') for s in log_list])
+    log_list = list(filter(re.compile('best_*').match, os.listdir(path)))
+    log_list = list([s.replace('best_', '') for s in log_list])
+    log_list = list([s.replace('.pt', '') for s in log_list])
     if not log_list:
         return 0
-    return max(list(map(int, log_list)))+1
+    return max(list(map(float, log_list)))
+
+
+def map_init(path):
+    mapping = {}
+    i = 0
+    for directory in os.listdir(path):
+        mapping[f'{i}'] = directory
+
+    return mapping
 
 
 def get_default_device():
@@ -65,6 +74,8 @@ class DeviceDataLoader:
     def __len__(self):
         """Number of batches"""
         return len(self.dl)
+
+
 
 
 
